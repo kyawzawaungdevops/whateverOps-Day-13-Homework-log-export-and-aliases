@@ -4,14 +4,28 @@ services:
   mongodb:
     container_name: mongodb_service
     image: "mongo:latest"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - mongodb-service
 
   redis:
     container_name: redis_service
     image: "redis:latest"
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
-      - mynetwork
+      mynetwork:
+        aliases:
+          - redis-service
 
   app:
     container_name: hello-wops
@@ -23,13 +37,19 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - MONGO_HOST=mongodb
+      - MONGO_HOST=mongodb-service
       - MONGO_PORT=27017
-      - REDIS_HOST=redis
+      - REDIS_HOST=redis-service
       - REDIS_PORT=6379
       - PORT=3000
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     networks:
-      - mynetwork      
+      - mynetwork
 
 networks:
   mynetwork:
+    driver: bridge
